@@ -26,7 +26,9 @@ function pwde() {
 
 # Directory listing with emojis (enhanced for zsh)
 function lse() {
-    ls -1 "$@" | while read -r file; do
+    # Use for loop to handle filenames with spaces correctly
+    local IFS=$'\n'
+    for file in $(ls -1 "$@"); do
         if [ -d "$file" ]; then
             echo "📁 $file"
         elif [ -L "$file" ]; then
@@ -65,7 +67,15 @@ function lse() {
 
 # Detailed listing with emojis and descriptions
 function lsed() {
-    ls -lh "$@" | tail -n +2 | while read -r perms links owner group size month day time file; do
+    ls -lh "$@" | tail -n +2 | while IFS= read -r line; do
+        # Parse the line more carefully
+        perms=$(echo "$line" | awk '{print $1}')
+        size=$(echo "$line" | awk '{print $5}')
+        month=$(echo "$line" | awk '{print $6}')
+        day=$(echo "$line" | awk '{print $7}')
+        time=$(echo "$line" | awk '{print $8}')
+        file=$(echo "$line" | awk '{for(i=9;i<=NF;i++) printf "%s%s", $i, (i<NF ? " " : "")}')
+        
         emoji="📄"
         if [[ "$perms" == d* ]]; then
             emoji="📁"
