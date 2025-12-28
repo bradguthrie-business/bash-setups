@@ -109,8 +109,8 @@ Edit the `LSCOLORS` or `LS_COLORS` variables at the top of each file.
 ### Adding More Emoji Types
 Add conditions to the `lse` function to recognize additional file extensions:
 ```bash
-elif [[ "$file" == *.cpp ]]; then
-    echo "⚡ $file"
+elif [[ "$file" == *.cpp || "$file" == *.hpp ]]; then
+    echo "⚡️ $file"
 ```
 
 ### Modifying the Prompt

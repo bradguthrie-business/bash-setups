@@ -39,7 +39,7 @@ export PS1="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[33m\]\$(par
 
 # Directory listing with emojis (function to show file types)
 function lse() {
-    # Use a null-delimited approach to handle filenames with spaces
+    # Use newline-delimited approach to handle filenames with spaces
     local IFS=$'\n'
     for file in $(ls -1 "$@"); do
         if [ -d "$file" ]; then
