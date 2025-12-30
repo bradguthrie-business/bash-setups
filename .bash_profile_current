@@ -1,0 +1,172 @@
+# ============================================================
+# Git Bash profile (Windows)
+# ============================================================
+
+# Load standard bash files if present
+test -f ~/.profile && . ~/.profile
+test -f ~/.bashrc && . ~/.bashrc
+
+# ============================================================
+# Colors (ANSI)
+# ============================================================
+
+export WHITE='\033[0m'      # reset / default
+export RED='\033[0;31m'
+export GREEN='\033[0;32m'
+export YELLOW='\033[1;33m' # bold yellow
+export BLUE='\033[0;34m'
+export PURPLE='\033[0;35m'
+export CYAN='\033[0;36m'
+
+# ============================================================
+# ls colors (Git Bash safe)
+# ============================================================
+
+export CLICOLOR=1
+export LS_COLORS="\
+di=33:\
+ex=32:\
+fi=34:\
+ln=36:\
+pi=33:\
+so=33:\
+bd=33:\
+cd=33:\
+or=31:\
+mi=31:\
+*.md=36:"
+
+# ============================================================
+# Utility functions
+# ============================================================
+
+reload_bash_profile() {
+  source ~/.bash_profile
+  printf "\n✅ ${GREEN}Reloaded${WHITE} ${YELLOW}~/.bash_profile${WHITE}\n📌 ${CYAN}Location: ${YELLOW}~/.bash_profile${WHITE}\n\n"
+}
+
+edit_bash_profile() {
+  cursor ~/.bash_profile
+  printf "\n✅ ${GREEN}Opened${WHITE} ${YELLOW}~/.bash_profile${WHITE} in ${CYAN}Cursor${WHITE}\n\n"
+}
+
+list_colors() {
+  printf "
+  ----- ${PURPLE}Color Variables${WHITE} -----
+  ${WHITE}WHITE${WHITE} text (default), referenced as ${WHITE}{WHITE}${WHITE}
+  ${RED}RED${WHITE} text, referenced as ${RED}{RED}${WHITE}
+  ${GREEN}GREEN${WHITE} text, referenced as ${GREEN}{GREEN}${WHITE}
+  ${YELLOW}YELLOW${WHITE} text, referenced as ${YELLOW}{YELLOW}${WHITE}
+  ${BLUE}BLUE${WHITE} text, referenced as ${BLUE}{BLUE}${WHITE}
+  ${PURPLE}PURPLE${WHITE} text, referenced as ${PURPLE}{PURPLE}${WHITE} 
+  ${CYAN}CYAN${WHITE} text, referenced as ${CYAN}{CYAN}${WHITE}
+  "
+}
+
+list_commands() {
+  printf "
+  ----- ${PURPLE}Commands${WHITE} -----
+  ${YELLOW}reload_bash_profile${WHITE}   (alias: ${CYAN}srcb${WHITE})
+  ${YELLOW}edit_bash_profile${WHITE}     (alias: ${CYAN}editb${WHITE})
+  ${YELLOW}list_colors${WHITE}           (alias: ${CYAN}listcolors${WHITE})
+  ${YELLOW}list_commands${WHITE}         (alias: ${CYAN}listcommands${WHITE})
+
+  ----- ${PURPLE}Aliases${WHITE} -----
+  ${CYAN}ls${WHITE} → ${BLUE}fancy ${YELLOW}ls command ${BLUE}with ${BLUE}icons! 📁 📘 📜 ⚙️  📄${WHITE}
+  ${CYAN}pwd${WHITE} → ${BLUE}fancy, ${GREEN}colorized, ${YELLOW}pwd command ${BLUE}with ${YELLOW}alternating ${CYAN}colors${WHITE}
+  ${CYAN}srcb${WHITE} → Sources the latest ${YELLOW}~/.bash_profile${WHITE} for ${GREEN}Git Bash${WHITE}
+  ${CYAN}editb${WHITE} → Opens up ${CYAN}Cursor${YELLOW} to edit ~/.bash_profile${WHITE}
+  ${CYAN}list${WHITE} → Lists all ${YELLOW}custom commands, aliases, and colors${WHITE}
+  "
+}
+
+list_all() {
+  printf "
+  ${WHITE}----- ${PURPLE}List of all custom commands, aliases, and colors${WHITE} -----
+  "
+  list_commands
+  list_colors
+} 
+
+# ============================================================
+# Fancy ls (icons + colors)
+# ======================================================s======
+
+ls_fancy() {
+  command ls -F --color=always "$@" | awk '
+    {
+      raw = $NF
+      name = raw
+      gsub(/\x1b\[[0-9;]*m/, "", name)
+
+      if (name ~ /\/$/) {
+        sub(/\/$/, "", name)
+        $NF = "📁 " raw
+      }
+      else if (name ~ /\.md$/) {
+        $NF = "📘 " raw
+      }
+      else if (name ~ /\.(js|ts|jsx|tsx)$/) {
+        $NF = "📜 " raw
+      }
+      else if (name ~ /\.(json|env|rc)$/ || name ~ /\.config\.js$/) {
+        $NF = "⚙️  " raw
+      }
+      else if (name == "node_modules") {
+        $NF = "📁 \033[90m" raw "\033[0m"
+      }
+      else {
+        $NF = "📄 " raw
+      }
+
+      print
+    }
+  '
+}
+
+# ============================================================
+# Pretty pwd (alternating colors)
+# ============================================================
+
+pwd_fancy() {
+  local path="$(command pwd)"
+  local IFS='/'
+  local parts=($path)
+  local out=""
+  local i=0
+
+  for part in "${parts[@]}"; do
+    [[ -z "$part" ]] && continue
+    if (( i % 2 == 0 )); then
+      out+="${YELLOW}/$part"
+    else
+      out+="${CYAN}/$part"
+    fi
+    ((i++))
+  done
+
+  printf "%b\n" "${out}${WHITE}"
+}
+
+# ============================================================
+# Aliases
+# ============================================================
+
+# fancy ls and pwd by default
+alias ls='ls_fancy'
+alias pwd='pwd_fancy'
+
+# shortcuts
+alias srcb='reload_bash_profile'
+alias editb='edit_bash_profile'
+alias listcolors='list_colors'
+alias listcommands='list_commands'
+alias list='list_all'
+alias listall='list_all'
+
+alias srctest='srcb && list'
+# git typo forgiveness
+alias got='git'
+alias gut='git'
+alias gir='git'
+alias giy='git'
