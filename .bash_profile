@@ -1,5 +1,6 @@
+#!/usr/bin/env bash
 # ============================================================
-# Git Bash profile (Windows)
+# File: ~/.bash_profile
 # ============================================================
 # Author: Brad Guthrie
 # Last updated: 2025-12-28
@@ -61,7 +62,7 @@ mi=31:\
 # Function to get current git branch
 git_branch() {
   local branch
-  branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+  branch=$(git symbolic-ref --short HEAD 2>/dev/null) || return
   if [[ -n "$branch" ]]; then
     printf " ${CYAN}on${WHITE} ${PURPLE}⎇ %s${WHITE}" "$branch"
   fi
@@ -262,7 +263,8 @@ ls_fancy() {
 # ============================================================
 
 pwd_fancy() {
-  local path="$(command pwd)"
+  local path
+  path="$(command pwd)"
   local IFS='/'
   local parts=($path)
   local out=""
@@ -287,7 +289,8 @@ pwd_fancy() {
 
 # Quick directory navigation
 up() {
-  local levels=${1:-1}
+  local levels
+  levels=${1:-1}
   local path=""
   for ((i=0; i<levels; i++)); do
     path="../$path"
